@@ -1,0 +1,27 @@
+version: '3'
+services:
+  docker_gen:
+    image: jwilder/docker-gen
+    volumes:
+      - "/net/docker_tmp/templates:/etc/docker-gen/templates:ro"
+      - "/var/run/docker.sock:/tmp/docker.sock:ro"
+      - "haconfig:/etc/haproxy/"
+    command: " -notify-sighup docker-gen_haproxy_1 -watch /etc/docker-gen/templates/haproxy.tmpl /etc/haproxy/haproxy.cfg"
+  haproxy:
+    depends_on: 
+      - docker_gen
+    image: alpine/haproxy
+    volumes:
+      - "haconfig:/etc/haproxy/:ro"
+    networks:
+      - backend-net
+    ports:
+      - "80:80"
+      - "443:443"
+    command: "-f /etc/haproxy/haproxy.cfg"
+
+networks:
+  backend-net:
+
+volumes:
+  haconfig:
