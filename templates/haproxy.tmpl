@@ -37,7 +37,7 @@ backend {{ $host }}
 	{{ range $index, $container := $containers }}
 		{{ $addrlen := len $container.Addresses }}
         {{ range $index, $network := $container.Networks }}
-            {{ if eq $network.name "haproxy" }}
+            {{ if eq $network.Name "haproxy" }}
                 {{ if eq $addrlen 1 }}
                     {{ $addr := index $container.Addresses 0 }}
 	server {{ replace $network.IP "." "" -1 }} {{ $network.IP }}:{{ $addr.Port }}

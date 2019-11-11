@@ -1,12 +1,12 @@
 version: '3.7'
 services:
   docker_gen:
-    image: jwilder/docker-gen
+    image: alpine/docker-gen
     volumes:
       - "/opt/docker/docker-gen-haproxy/templates:/etc/docker-gen/templates:ro"
       - "/var/run/docker.sock:/tmp/docker.sock:ro"
       - "haconfig:/etc/haproxy/"
-    command: " -notify-sighup docker-gen-haproxy_haproxy_1 -notify-sighup 01604a5c5d88 -watch /etc/docker-gen/templates/haproxy.tmpl /etc/haproxy/haproxy.cfg"
+    command: " -notify-sighup docker-gen-haproxy_haproxy_1 -notify-sighup docker-gen-haproxy_haproxy_1 -watch /etc/docker-gen/templates/haproxy.tmpl /etc/haproxy/haproxy.cfg"
   haproxy:
     depends_on: 
       - docker_gen
