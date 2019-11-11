@@ -1,0 +1,48 @@
+global
+	log         127.0.0.1 local2 info
+        pidfile     /var/run/haproxy.pid
+        maxconn     2000
+
+defaults
+	mode               http
+        log                global
+        option             httplog
+        timeout connect    10s
+        timeout client     30s
+        timeout server     30s
+	
+############
+# Frontend #
+############
+
+frontend http_in
+	bind *:80
+
+{{ range $host, $containers := groupByMulti $ "Env.VIRTUAL_HOST" "," }}
+	acl host_{{ $host }} hdr(host) -i {{ $host }}
+{{ end }}
+
+{{ range $host, $containers := groupByMulti $ "Env.VIRTUAL_HOST" "," }}
+	use_backend {{ $host }} if host_{{ $host }}
+{{ end }}
+
+
+############
+# Backends #
+############
+
+{{ range $host, $containers := groupByMulti $ "Env.VIRTUAL_HOST" "," }}
+backend {{ $host }}
+	balance roundrobin
+	{{ range $index, $container := $containers }}
+		{{ $addrlen := len $container.Addresses }}
+        {{ range $index, $networks := $container.Networks }}
+            {{ if eq $networks.name "haproxy" }}
+                {{ if eq $addrlen 1 }}
+                    {{ $addr := index $container.Addresses 0 }}
+	server {{ replace $network.IP "." "" -1 }} {{ $network.IP }}:{{ $addr.Port }}
+                {{ end }}
+            {{ end }}
+        {{ end }}
+	{{ end }}
+{{ end }}
