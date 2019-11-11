@@ -3,7 +3,7 @@ services:
   docker_gen:
     image: jwilder/docker-gen
     volumes:
-      - "/net/docker_tmp/templates:/etc/docker-gen/templates:ro"
+      - "/opt/docker/docker-gen-haproxy/templates:/etc/docker-gen/templates:ro"
       - "/var/run/docker.sock:/tmp/docker.sock:ro"
       - "haconfig:/etc/haproxy/"
     command: " -notify-sighup docker-gen-haproxy_haproxy_1 -notify-sighup 01604a5c5d88 -watch /etc/docker-gen/templates/haproxy.tmpl /etc/haproxy/haproxy.cfg"
